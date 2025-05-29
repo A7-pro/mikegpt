@@ -1,13 +1,13 @@
-
 import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, LiveServerMessage, Session, Modality, SpeechConfig, VoiceConfig, PrebuiltVoiceConfig, MediaResolution, ContextWindowCompressionConfig, Tool } from "@google/genai";
 import { GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL, GEMINI_LIVE_AUDIO_MODEL, SYSTEM_INSTRUCTION, AI_VOICE_DEFAULT_URI } from '../constants';
 import { GroundingChunk as LocalGroundingChunk } from "../types";
 
-if (!process.env.API_KEY) {
+const apiKey = process.env.API_KEY;
+if (!apiKey) {
   console.error("API_KEY environment variable is not set. Please ensure it is configured.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "MISSING_API_KEY" });
+const ai = new GoogleGenAI({ apiKey: apiKey || "MISSING_API_KEY" });
 
 let chatSession: Chat | null = null;
 let liveAudioSession: Session | null = null; 
@@ -106,7 +106,7 @@ export const generateTextStream = async (
   onError: (error: string) => void,
   uploadedImage?: { mimeType: string; data: string } 
 ): Promise<void> => {
-  if (!process.env.API_KEY || process.env.API_KEY === "MISSING_API_KEY") {
+  if (!apiKey || apiKey === "MISSING_API_KEY") {
     onError("API Key not configured. Please contact the administrator.");
     onChunk("", true);
     return;
@@ -171,7 +171,7 @@ export const generateTextStream = async (
 
 
 export const generateImage = async (prompt: string): Promise<{ imageUrl?: string; error?: string }> => {
-  if (!process.env.API_KEY || process.env.API_KEY === "MISSING_API_KEY") {
+  if (!apiKey || apiKey === "MISSING_API_KEY") {
     return { error: "API Key not configured. Please contact the administrator." };
   }
   try {
@@ -264,7 +264,7 @@ export const startLiveAudioSession = async (
   onTurnComplete: () => void,
   onError: (error: string) => void
 ): Promise<boolean> => {
-  if (!process.env.API_KEY || process.env.API_KEY === "MISSING_API_KEY") {
+  if (!apiKey || apiKey === "MISSING_API_KEY") {
     onError("API Key not configured for live audio.");
     return false;
   }
