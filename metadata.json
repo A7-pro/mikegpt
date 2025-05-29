@@ -1,0 +1,9 @@
+
+{
+  "name": "Mike - AI Assistant",
+  "description": "A Saudi-accented AI assistant that engages in voice conversations, generates images, and responds with local cultural expressions. Created by @rnp_e.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "prompt": ""
+}
