@@ -2,7 +2,7 @@ import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, LiveServerMe
 import { GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL, GEMINI_LIVE_AUDIO_MODEL, SYSTEM_INSTRUCTION, AI_VOICE_DEFAULT_URI } from '../constants';
 import { GroundingChunk as LocalGroundingChunk } from "../types";
 
-const apiKey = process.env.API_KEY;
+const apiKey = import.meta.env.VITE_API_KEY;
 if (!apiKey) {
   console.error("API_KEY environment variable is not set. Please ensure it is configured.");
 }
