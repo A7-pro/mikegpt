@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mike - مساعدك الذكي الفخم</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif;
+      /* New luxurious dark gradient: deep dark purple -> indigo -> black */
+      @apply bg-gradient-to-b from-purple-950 via-indigo-900 to-black text-slate-100 dark:bg-gradient-to-b dark:from-slate-900 dark:via-indigo-800 dark:to-black dark:text-slate-50 transition-colors duration-300;
+    }
+    /* Custom scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      @apply bg-slate-700 dark:bg-slate-800 rounded-md; /* Adjusted for darker theme */
+    }
+    ::-webkit-scrollbar-thumb {
+      @apply bg-slate-500 dark:bg-slate-600 rounded-md; /* Adjusted for darker theme */
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      @apply bg-slate-400 dark:bg-slate-500; /* Adjusted for darker theme */
+    }
+    /* For Firefox */
+    html {
+      scrollbar-width: thin;
+      --scrollbar-track-color: theme('colors.slate.700'); 
+      --scrollbar-thumb-color: theme('colors.slate.500');
+    }
+    html.dark {
+      --scrollbar-track-color: theme('colors.slate.800'); 
+      --scrollbar-thumb-color: theme('colors.slate.600'); 
+    }
+    html {
+      scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+    }
+    
+    /* Ensure html, body, and #root take full height */
+    html, body, #root {
+        height: 100%;
+        min-height: 100vh; 
+    }
+    .shadow-top {
+      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.0.1",
+    "react-transition-group": "https://esm.sh/react-transition-group@4.4.5"
+  }
+}
+</script>
+  <script type="module" crossorigin src="/assets/index-C43PPp1G.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html><link rel="stylesheet" href="index.css">
