@@ -13,9 +13,7 @@
     "react": "^19.1.0",
     "@google/genai": "^1.0.1",
     "react-transition-group": "4.4.5",
-    "@supabase/supabase-js": "^2.39.0",
-    "framer-motion": "^10.18.0",
-    "react-intersection-observer": "^9.5.3"
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
