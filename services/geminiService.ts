@@ -174,21 +174,33 @@ export const generateImage = async (prompt: string): Promise<{ imageUrl?: string
   if (!apiKey || apiKey === "MISSING_API_KEY") {
     return { error: "API Key not configured. Please contact the administrator." };
   }
+  
+  // Check if the API key has billing enabled
   try {
-    const response = await ai.models.generateImages({
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + apiKey);
+    const data = await response.json();
+    
+    if (data.error && data.error.status === 'PERMISSION_DENIED') {
+      return { error: "عذراً، ميزة إنشاء الصور تتطلب حساباً مدفوعاً. يرجى التواصل مع المطور." };
+    }
+    
+    const imageResponse = await ai.models.generateImages({
       model: GEMINI_IMAGE_MODEL,
       prompt: prompt,
       config: { numberOfImages: 1, outputMimeType: 'image/jpeg' },
     });
 
-    if (response.generatedImages && response.generatedImages.length > 0) {
-      const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+    if (imageResponse.generatedImages && imageResponse.generatedImages.length > 0) {
+      const base64ImageBytes: string = imageResponse.generatedImages[0].image.imageBytes;
       return { imageUrl: `data:image/jpeg;base64,${base64ImageBytes}` };
     }
     return { error: "لم أتمكن من إنشاء الصورة. حاول مرة أخرى بطلب مختلف." };
   } catch (error) {
     console.error("Gemini API image generation error:", error);
-    return { error: `عفوًا، واجهتني مشكلة في إنشاء الصورة. ${error instanceof Error ? error.message : String(error)}` };
+    if (error instanceof Error && error.message.includes('INVALID_ARGUMENT')) {
+      return { error: "عذراً، ميزة إنشاء الصور تتطلب حساباً مدفوعاً. يرجى التواصل مع المطور." };
+    }
+    return { error: `عذراً، حدث خطأ في إنشاء الصورة. ${error instanceof Error ? error.message : String(error)}` };
   }
 };
 
