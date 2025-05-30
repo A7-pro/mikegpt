@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChatMessage as ChatMessageProps, MessageSender, MessageType, GroundingChunk } from '../types';
 import { AI_NAME } from '../constants';
@@ -44,6 +43,33 @@ const ChatMessageComponent: React.FC<Props> = ({ message, onSpeak }) => {
 
   const messageTime = new Date(message.timestamp).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
 
+  // Enhanced message bubble styles with better shadows and gradients
+  const getBubbleStyles = () => {
+    if (isUser) {
+      return 'bg-gradient-to-br from-sky-400 to-sky-600 text-white rounded-t-2xl rounded-l-2xl dark:from-sky-500 dark:to-sky-700 shadow-lg hover:shadow-xl transition-shadow duration-200';
+    }
+    if (isSystem) {
+      if (message.type === MessageType.ERROR) {
+        return 'bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/60 dark:to-red-800/60 border border-red-200 dark:border-red-700/50 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200';
+      }
+      return 'bg-gradient-to-r from-sky-50 to-sky-100 dark:from-sky-900/40 dark:to-sky-800/40 border border-sky-200 dark:border-sky-700/50 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200';
+    }
+    return 'bg-gradient-to-br from-white to-slate-50 dark:from-slate-700 dark:to-slate-800 border border-slate-200 dark:border-slate-600/50 rounded-t-2xl rounded-r-2xl shadow-lg hover:shadow-xl transition-shadow duration-200';
+  };
+
+  // Enhanced text styles
+  const getTextStyles = () => {
+    if (isUser) {
+      return 'text-white';
+    }
+    if (isSystem) {
+      return message.type === MessageType.ERROR 
+        ? 'text-red-700 dark:text-red-300' 
+        : 'text-sky-700 dark:text-sky-300';
+    }
+    return 'text-slate-800 dark:text-slate-100';
+  };
+
   const renderTextContent = (text: string) => {
     let html = text
         .replace(/&/g, "&amp;")
@@ -77,26 +103,12 @@ const ChatMessageComponent: React.FC<Props> = ({ message, onSpeak }) => {
     return <div className={`text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words ${textColorClass}`} dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
-
-  const getBubbleStyles = () => {
-    if (isUser) {
-      return 'bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-t-2xl rounded-l-2xl dark:from-sky-600 dark:to-sky-700 shadow-lg';
-    }
-    if (isSystem) {
-      if (message.type === MessageType.ERROR) {
-        return 'bg-red-100 dark:bg-red-900/60 border border-red-300 dark:border-red-700 rounded-xl shadow-md';
-      }
-      return 'bg-sky-100 dark:bg-sky-800/70 border border-sky-200 dark:border-sky-700/70 rounded-xl shadow-md text-xs';
-    }
-    return 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-t-2xl rounded-r-2xl shadow-lg';
-  };
-
   const alignmentClasses = isUser ? 'justify-end' : 'justify-start';
   const itemOrderClasses = isUser ? 'flex-row-reverse' : 'flex-row';
 
   return (
-    <div className={`flex ${alignmentClasses} mb-4 sm:mb-6 w-full`}>
-      <div className={`flex ${itemOrderClasses} items-end max-w-[85%] sm:max-w-[80%]`}>
+    <div className={`flex ${alignmentClasses} mb-4 sm:mb-6 w-full animate-fadeIn`}>
+      <div className={`flex ${itemOrderClasses} items-end max-w-[85%] sm:max-w-[80%] group`}>
         {!isUser && (
           <div className="mr-2 sm:mr-3 self-end rtl:ml-2 rtl:mr-0 sm:rtl:ml-3">
             {isAI && <AIIcon />}
@@ -109,7 +121,7 @@ const ChatMessageComponent: React.FC<Props> = ({ message, onSpeak }) => {
           </div>
         )}
 
-        <div className={`px-3 py-2 sm:px-4 sm:py-3 rounded-2xl ${getBubbleStyles()}`}>
+        <div className={`px-3 py-2 sm:px-4 sm:py-3 ${getBubbleStyles()} ${getTextStyles()}`}>
           <div className="flex justify-between items-center mb-0.5">
             <div>
               {!isUser && !isSystem && <p className="text-xs font-semibold text-green-600 dark:text-green-400">{AI_NAME}</p>}

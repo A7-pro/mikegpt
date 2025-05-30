@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mike gpt</title>
+  <title>Mike - الذكاء الاصطناعي السعودي</title>
+  <meta name="description" content="مايك - أول ذكاء اصطناعي سعودي يتحدث باللهجة المحلية ويفهم ثقافتك">
+  <meta name="theme-color" content="#1e40af">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,61 +13,70 @@
   <style>
     body {
       font-family: 'IBM Plex Sans Arabic', 'Tajawal', sans-serif;
-      /* New luxurious dark gradient: deep dark purple -> indigo -> black */
-      @apply bg-gradient-to-b from-purple-950 via-indigo-900 to-black text-slate-100 dark:bg-gradient-to-b dark:from-slate-900 dark:via-indigo-800 dark:to-black dark:text-slate-50 transition-colors duration-300;
+      @apply bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900 
+             dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:text-slate-50 
+             transition-colors duration-300;
     }
-    /* Custom scrollbar for webkit browsers */
+    
+    /* Improved scrollbar styling */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
     ::-webkit-scrollbar-track {
-      @apply bg-slate-700 dark:bg-slate-800 rounded-md; /* Adjusted for darker theme */
+      @apply bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-full;
     }
     ::-webkit-scrollbar-thumb {
-      @apply bg-slate-500 dark:bg-slate-600 rounded-md; /* Adjusted for darker theme */
+      @apply bg-slate-400/80 dark:bg-slate-600/80 rounded-full hover:bg-slate-500/80 dark:hover:bg-slate-500/80 transition-colors;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      @apply bg-slate-400 dark:bg-slate-500; /* Adjusted for darker theme */
-    }
-    /* For Firefox */
+    
+    /* Firefox scrollbar */
     html {
       scrollbar-width: thin;
-      --scrollbar-track-color: theme('colors.slate.700'); 
-      --scrollbar-thumb-color: theme('colors.slate.500');
-    }
-    html.dark {
-      --scrollbar-track-color: theme('colors.slate.800'); 
-      --scrollbar-thumb-color: theme('colors.slate.600'); 
-    }
-    html {
       scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
     }
     
-    /* Ensure html, body, and #root take full height */
-    html, body, #root {
-        height: 100%;
-        min-height: 100vh; 
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    .animate-fadeIn {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    /* Ensure full height */
+    html, body, #root {
+      height: 100%;
+      min-height: 100vh;
+    }
+    
+    /* Enhanced shadows */
     .shadow-top {
-      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 
+                  0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    /* Glass effect for containers */
+    .glass-effect {
+      @apply backdrop-blur-lg bg-white/80 dark:bg-slate-800/80 border border-white/20 dark:border-slate-700/20;
     }
   </style>
-<script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.0.1",
-    "react-transition-group": "https://esm.sh/react-transition-group@4.4.5"
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+      "react/": "https://esm.sh/react@^19.1.0/",
+      "react": "https://esm.sh/react@^19.1.0",
+      "@google/genai": "https://esm.sh/@google/genai@^1.0.1",
+      "react-transition-group": "https://esm.sh/react-transition-group@4.4.5"
+    }
   }
-}
-</script>
+  </script>
 </head>
 <body>
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
-</html><link rel="stylesheet" href="index.css">
-<script src="index.tsx" type="module"></script>
+</html>
