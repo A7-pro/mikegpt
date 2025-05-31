@@ -55,3 +55,4 @@ export const ADMIN_EMAIL = 'admin@example.com';
 export const CALL_GREETING_USER_INITIATED = 'مرحباً، أنا أستمع إليك.';
 export const GUEST_USERNAME = 'زائر';
 export const GUEST_USER_ID = 'guest-user';
+export const LOCAL_STORAGE_AI_VOICE_URI_KEY_PREFIX = 'mikeSelectedAIVoiceURI';
