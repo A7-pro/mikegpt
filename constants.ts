@@ -46,3 +46,9 @@ export const SUPPORTED_FILE_TYPES = {
   videos: ['video/mp4', 'video/webm', 'video/ogg'],
   documents: ['.pdf', '.doc', '.docx', '.txt', '.rtf']
 };
+
+// Add missing constants
+export const INITIAL_GREETING = 'مرحباً بك! كيف يمكنني مساعدتك اليوم؟';
+export const VOICE_COMMAND_START = 'مايك';
+export const MAX_CONVERSATIONS_TO_KEEP = 20;
+export const ADMIN_EMAIL = 'admin@example.com';
