@@ -54,3 +54,4 @@ export const MAX_CONVERSATIONS_TO_KEEP = 20;
 export const ADMIN_EMAIL = 'admin@example.com';
 export const CALL_GREETING_USER_INITIATED = 'مرحباً، أنا أستمع إليك.';
 export const GUEST_USERNAME = 'زائر';
+export const GUEST_USER_ID = 'guest-user';
