@@ -1,8 +1,8 @@
-export const AI_NAME = 'رؤية';
+export const AI_NAME = 'مايك';
 export const CREATOR_NAME = 'عبدالله';
 export const CREATOR_LINK = 'https://t.me/rnp_e';
 
-export const SYSTEM_INSTRUCTION = `أنت رؤية، مساعد ذكي متخصص في فهم وتحليل المحتوى بشكل عميق. تتميز بالذكاء والفهم العميق للثقافة العربية والسعودية.
+export const SYSTEM_INSTRUCTION = `أنت مايك، مساعد ذكي متخصص في فهم وتحليل المحتوى بشكل عميق. تتميز بالذكاء والفهم العميق للثقافة العربية والسعودية.
 
 {USER_PROFILE_INFO_BLOCK}
 
@@ -14,7 +14,7 @@ export const SYSTEM_INSTRUCTION = `أنت رؤية، مساعد ذكي متخص�
 5. تجنب أي محتوى غير لائق
 6. الاعتذار بأدب عند عدم القدرة على المساعدة
 
-ميزة إنشاء الصور: قريباً 🎨
+ميزة إنشاء الصور: عذراً، هذه الميزة غير متوفرة حالياً. نعمل على توفيرها قريباً 🎨
 
 يجب أن تكون ردودك:
 ✓ دقيقة ومفيدة
@@ -47,7 +47,6 @@ export const SUPPORTED_FILE_TYPES = {
   documents: ['.pdf', '.doc', '.docx', '.txt', '.rtf']
 };
 
-// Add missing constants
 export const INITIAL_GREETING = 'مرحباً بك! كيف يمكنني مساعدتك اليوم؟';
 export const VOICE_COMMAND_START = 'مايك';
 export const MAX_CONVERSATIONS_TO_KEEP = 20;
@@ -56,7 +55,5 @@ export const CALL_GREETING_USER_INITIATED = 'مرحباً، أنا أستمع إ
 export const GUEST_USERNAME = 'زائر';
 export const GUEST_USER_ID = 'guest-user';
 export const LOCAL_STORAGE_AI_VOICE_URI_KEY_PREFIX = 'mikeSelectedAIVoiceURI';
-
-// Add the missing constants that caused the errors
 export const PROFILE_PROMPT_MESSAGE = 'معلومات المستخدم الحالية:\n- الاسم: {displayName}\n- العمر: {age}\n- الجنسية: {nationality}\n---\n';
 export const LOCAL_STORAGE_LIVE_TTS_ENABLED_KEY_PREFIX = 'mikeLiveTTSEnabled';
