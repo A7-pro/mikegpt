@@ -22,7 +22,7 @@ export const SYSTEM_INSTRUCTION = `أنت رؤية، مساعد ذكي متخص�
 ✓ مناسبة ثقافياً
 ✓ تراعي السياق المحلي`;
 
-export const GEMINI_TEXT_MODEL = 'gemini-pro';
+export const GEMINI_TEXT_MODEL = 'gemini-1.0-pro';
 export const GEMINI_IMAGE_MODEL = 'gemini-pro-vision';
 export const GEMINI_LIVE_AUDIO_MODEL = 'gemini-pro-live';
 
