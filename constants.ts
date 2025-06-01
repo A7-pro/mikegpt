@@ -56,3 +56,7 @@ export const CALL_GREETING_USER_INITIATED = 'مرحباً، أنا أستمع إ
 export const GUEST_USERNAME = 'زائر';
 export const GUEST_USER_ID = 'guest-user';
 export const LOCAL_STORAGE_AI_VOICE_URI_KEY_PREFIX = 'mikeSelectedAIVoiceURI';
+
+// Add the missing constants that caused the errors
+export const PROFILE_PROMPT_MESSAGE = 'معلومات المستخدم الحالية:\n- الاسم: {displayName}\n- العمر: {age}\n- الجنسية: {nationality}\n---\n';
+export const LOCAL_STORAGE_LIVE_TTS_ENABLED_KEY_PREFIX = 'mikeLiveTTSEnabled';
