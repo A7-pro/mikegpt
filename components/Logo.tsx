@@ -7,14 +7,17 @@ interface LogoProps {
   size?: number;
 }
 
-const MikeLogo: React.FC<LogoProps> = ({ className = '', iconOnly = false, size = 32 }) => {
+const RoayaLogo: React.FC<LogoProps> = ({ className = '', iconOnly = false, size = 32 }) => {
+  const primaryColor = "#2C5282";
+  const accentColor = "#4299E1";
+  
   if (iconOnly) {
     return (
       <div className={`inline-flex items-center ${className}`} style={{ width: size, height: size }}>
         <img 
-          src="https://i.ibb.co/JWqqz800/bf10e91ddd3f.jpg" 
+          src="/roaya-icon.png" 
           alt={`${AI_NAME} Icon`}
-          className="w-full h-full object-contain rounded-full"
+          className="w-full h-full object-contain"
           style={{ width: size, height: size }}
         />
       </div>
@@ -24,13 +27,14 @@ const MikeLogo: React.FC<LogoProps> = ({ className = '', iconOnly = false, size 
   return (
     <div className={`inline-flex flex-col items-center ${className}`}>
       <img 
-        src="https://i.ibb.co/JWqqz800/bf10e91ddd3f.jpg" 
+        src="/roaya-logo.png" 
         alt={`${AI_NAME} Logo`}
-        className="w-full h-auto object-contain rounded-full mb-2"
+        className="w-full h-auto object-contain mb-2"
         style={{ maxWidth: size * 3, maxHeight: size * 2 }}
       />
       <span 
-        className="font-bold text-lg text-amber-600 dark:text-amber-400"
+        className="font-bold text-lg"
+        style={{ color: primaryColor }}
       >
         {AI_NAME}
       </span>
@@ -38,4 +42,4 @@ const MikeLogo: React.FC<LogoProps> = ({ className = '', iconOnly = false, size 
   );
 };
 
-export default MikeLogo;
+export default RoayaLogo;
