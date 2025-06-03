@@ -127,17 +127,24 @@ export const generateTextStream = async (
 
     const result = await currentChat.sendMessageStream(requestPayload);
     
+    // Add validation check for result
+    if (!result || typeof result[Symbol.asyncIterator] !== 'function') {
+      throw new Error('Invalid response from Gemini API: Response is not iterable');
+    }
+
     let accumulatedText = "";
     let finalGroundingChunks: LocalGroundingChunk[] | undefined;
 
     for await (const chunk of result) {
+      if (!chunk) continue; // Skip null or undefined chunks
+      
       const textPart = chunk.text;
       if (textPart) {
         accumulatedText += textPart;
         onChunk(textPart, false, chunk.candidates?.[0]?.groundingMetadata?.groundingChunks as LocalGroundingChunk[] | undefined);
       }
       if (chunk.candidates?.[0]?.groundingMetadata?.groundingChunks) {
-        finalGroundingChunks = chunk.candidates?.[0]?.groundingMetadata?.groundingChunks as LocalGroundingChunk[];
+        finalGroundingChunks = chunk.candidates[0].groundingMetadata.groundingChunks as LocalGroundingChunk[];
       }
     }
     onChunk("", true, finalGroundingChunks);
