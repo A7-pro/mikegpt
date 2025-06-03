@@ -10,7 +10,7 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey });
 
 let chatSession: Chat | null = null;
-let liveAudioSession: Session | null = null; 
+let liveAudioSession: Session | null = null;
 let liveSessionResponseQueue: LiveServerMessage[] = [];
 let liveSessionTurnCompleteCallback: (() => void) | null = null;
 let liveSessionErrorCallback: ((error: string) => void) | null = null;
@@ -58,7 +58,7 @@ export const generateTextStream = async (
   prompt: string,
   onChunk: (textChunk: string, isFinal: boolean, groundingChunks?: LocalGroundingChunk[]) => void,
   onError: (error: string) => void,
-  uploadedImage?: { mimeType: string; data: string } 
+  uploadedImage?: { mimeType: string; data: string }
 ): Promise<void> => {
   if (!apiKey) {
     onError("API Key not configured. Please contact the administrator.");
@@ -79,6 +79,7 @@ export const generateTextStream = async (
 
     const requestPayload = { message: messageParts };
 
+    // Ensure the entire stream process is within the try/catch block
     const result = await currentChat.sendMessageStream(requestPayload);
 
     if (!result || typeof result[Symbol.asyncIterator] !== 'function') {
@@ -89,26 +90,37 @@ export const generateTextStream = async (
     let finalGroundingChunks: LocalGroundingChunk[] | undefined;
 
     for await (const chunk of result) {
-      if (!chunk) continue;
+      if (!chunk) continue; // Skip empty chunks
 
       const textPart = chunk.text;
       if (textPart) {
         accumulatedText += textPart;
+        // Pass grounding chunks as they arrive or when finalized
         onChunk(textPart, false, chunk.candidates?.[0]?.groundingMetadata?.groundingChunks);
       }
 
+      // Update final grounding chunks if present in the chunk
       if (chunk.candidates?.[0]?.groundingMetadata?.groundingChunks) {
         finalGroundingChunks = chunk.candidates[0].groundingMetadata.groundingChunks;
       }
     }
 
+    // Signal final state and pass the last known grounding chunks
     onChunk("", true, finalGroundingChunks);
+
   } catch (error) {
     console.error("Gemini API error:", error);
+    // Use a generic Arabic error message, optionally adding the technical detail in English/source language
     let errorMessage = `عفوًا، واجهتني مشكلة في معالجة طلبك.`;
-    if (error instanceof Error) errorMessage += ` ${error.message}`;
+    if (error instanceof Error && error.message) {
+        // Append technical detail in parentheses, assuming English messages are desired for debugging info
+        errorMessage += ` (${error.message})`;
+    } else if (typeof error === 'string') {
+         errorMessage += ` (${error})`;
+    }
+
     onError(errorMessage);
-    onChunk("", true);
+    onChunk("", true); // Ensure the stream is marked as complete on error
   }
 };
 
@@ -130,7 +142,13 @@ export const generateImage = async (prompt: string): Promise<{ imageUrl?: string
     return { error: "لم أتمكن من إنشاء الصورة. حاول مرة أخرى بطلب مختلف." };
   } catch (error) {
     console.error("Gemini API image error:", error);
-    return { error: `عذراً، حدث خطأ في إنشاء الصورة. ${error instanceof Error ? error.message : String(error)}` };
+    let errorMessage = `عذراً، حدث خطأ في إنشاء الصورة.`;
+     if (error instanceof Error && error.message) {
+        errorMessage += ` (${error.message})`;
+    } else if (typeof error === 'string') {
+         errorMessage += ` (${error})`;
+    }
+    return { error: errorMessage };
   }
 };
 
@@ -146,9 +164,9 @@ export const resetChat = (newInstruction?: string): void => {
 };
 
 export const startLiveAudioSession = async (
-  selectedVoiceName: string, 
-  onTextChunk: (text: string, isPartial: boolean) => void, 
-  onAudioChunk: (audioData: string, mimeType: string) => void, 
+  selectedVoiceName: string,
+  onTextChunk: (text: string, isPartial: boolean) => void,
+  onAudioChunk: (audioData: string, mimeType: string) => void,
   onTurnComplete: () => void,
   onError: (error: string) => void
 ): Promise<boolean> => {
@@ -178,7 +196,13 @@ export const startLiveAudioSession = async (
     });
     return true;
   } catch (error) {
-    onError(`فشل في بدء جلسة الصوت المباشر: ${error instanceof Error ? error.message : String(error)}`);
+    let errorMessage = `فشل في بدء جلسة الصوت المباشر:`;
+    if (error instanceof Error && error.message) {
+        errorMessage += ` (${error.message})`;
+    } else if (typeof error === 'string') {
+         errorMessage += ` (${error})`;
+    }
+    onError(errorMessage);
     liveAudioSession = null;
     return false;
   }
@@ -198,7 +222,13 @@ export const sendToLiveAudioSession = async (
     liveAudioSession.sendClientContent({ turns: [{ text: prompt }] });
     await handleLiveSessionTurn(onTextChunk, onAudioChunk);
   } catch (error) {
-    liveSessionErrorCallback?.(`خطأ في إرسال الرسالة للجلسة المباشرة: ${error instanceof Error ? error.message : String(error)}`);
+    let errorMessage = `خطأ في إرسال الرسالة للجلسة المباشرة:`;
+     if (error instanceof Error && error.message) {
+        errorMessage += ` (${error.message})`;
+    } else if (typeof error === 'string') {
+         errorMessage += ` (${error})`;
+    }
+    liveSessionErrorCallback?.(errorMessage);
   }
 };
 
@@ -208,6 +238,12 @@ async function handleLiveSessionTurn(
 ): Promise<void> {
   let done = false;
   while (!done) {
+    // Use a small delay to prevent tight loop blocking if queue is empty
+    if (liveSessionResponseQueue.length === 0) {
+       await new Promise(resolve => setTimeout(resolve, 50));
+       continue; // Check queue again
+    }
+
     const message = liveSessionResponseQueue.shift();
     if (message) {
       message.serverContent?.modelTurn?.parts?.forEach(part => {
@@ -218,17 +254,15 @@ async function handleLiveSessionTurn(
       });
       if (message.serverContent?.turnComplete) {
         done = true;
-        onTextChunk("", false);
+        onTextChunk("", false); // Signal end of partial text
         liveSessionTurnCompleteCallback?.();
       }
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 50));
     }
   }
 }
 
 export const closeLiveAudioSession = (): void => {
-  try { liveAudioSession?.close(); } catch {}
+  try { liveAudioSession?.close(); } catch {} // Handle potential errors during close
   liveAudioSession = null;
   liveSessionResponseQueue = [];
   liveSessionTurnCompleteCallback = null;
