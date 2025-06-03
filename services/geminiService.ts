@@ -1,4 +1,4 @@
-import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, LiveServerMessage, Session } from "@google/genai";
+import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, LiveServerMessage, Session, Tool } from "@google/genai";
 import { SYSTEM_INSTRUCTION, AI_VOICE_DEFAULT_URI } from '../constants';
 import { GroundingChunk as LocalGroundingChunk } from "../types";
 
@@ -122,7 +122,7 @@ export const generateTextStream = async (
     };
 
     if (!uploadedImage || !uploadedImage.data) {
-      requestPayload.tools = [{ googleSearch: {} }] as Tool[];
+      requestPayload.tools = [{ googleSearch: {} }];
     }
 
     const result = await currentChat.sendMessageStream(requestPayload);
