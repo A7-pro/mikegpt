@@ -22,20 +22,16 @@ export const SYSTEM_INSTRUCTION = `أنت مايك، مساعد ذكي متخص�
 ✓ مناسبة ثقافياً
 ✓ تراعي السياق المحلي`;
 
-export const GEMINI_TEXT_MODEL = 'gemini-pro';
-export const GEMINI_IMAGE_MODEL = 'gemini-pro-vision';
-export const GEMINI_LIVE_AUDIO_MODEL = 'gemini-pro-live';
+export const AI_VOICE_DEFAULT_URI = 'ar-SA-HamedNeural';
+export const AVAILABLE_AI_VOICES = [
+  { uri: 'ar-SA-HamedNeural', name: 'حامد (سعودي)', genderHint: 'male' },
+  { uri: 'ar-SA-ZariyahNeural', name: 'زارية (سعودية)', genderHint: 'female' }
+];
 
 export const SUPPORTED_STT_LANGUAGES = [
   { value: 'ar-SA', label: 'العربية (السعودية)' },
   { value: 'ar', label: 'العربية (عام)' },
   { value: 'en-US', label: 'الإنجليزية (أمريكا)' }
-];
-
-export const AI_VOICE_DEFAULT_URI = 'ar-SA-HamedNeural';
-export const AVAILABLE_AI_VOICES = [
-  { uri: 'ar-SA-HamedNeural', name: 'حامد (سعودي)', genderHint: 'male' },
-  { uri: 'ar-SA-ZariyahNeural', name: 'زارية (سعودية)', genderHint: 'female' }
 ];
 
 export const MAX_UPLOAD_FILES = 21;

@@ -1,5 +1,5 @@
-import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, LiveServerMessage, Session, Modality, SpeechConfig, VoiceConfig, PrebuiltVoiceConfig, MediaResolution, ContextWindowCompressionConfig, Tool } from "@google/genai";
-import { GEMINI_TEXT_MODEL, GEMINI_IMAGE_MODEL, GEMINI_LIVE_AUDIO_MODEL, SYSTEM_INSTRUCTION, AI_VOICE_DEFAULT_URI } from '../constants';
+import { GoogleGenAI, Chat, GenerateContentResponse, Content, Part, LiveServerMessage, Session } from "@google/genai";
+import { SYSTEM_INSTRUCTION, AI_VOICE_DEFAULT_URI } from '../constants';
 import { GroundingChunk as LocalGroundingChunk } from "../types";
 
 const apiKey = import.meta.env.VITE_API_KEY;
@@ -15,7 +15,6 @@ let liveSessionResponseQueue: LiveServerMessage[] = [];
 let liveSessionTurnCompleCallback: (() => void) | null = null;
 let liveSessionErrorCallback: ((error: string) => void) | null = null;
 
-
 const getInitialSystemInstruction = (): string => {
   const adminInstruction = localStorage.getItem('mikeAdminSystemInstruction');
   return adminInstruction || SYSTEM_INSTRUCTION.replace("{USER_PROFILE_INFO_BLOCK}", "");
@@ -26,10 +25,9 @@ let currentSystemInstruction: string = getInitialSystemInstruction();
 window.addEventListener('systemPromptAdminUpdate', ((event: CustomEvent) => {
   if (event.detail && typeof event.detail === 'string') {
     console.log("AdminPanel updated system prompt. Updating service...");
-    updateChatSystemInstruction(event.detail, true); // Force update from admin
+    updateChatSystemInstruction(event.detail, true);
   }
 }) as EventListener);
-
 
 export const updateChatSystemInstruction = (newInstruction: string, isAdminUpdate: boolean = false): void => {
   const adminSavedInstruction = localStorage.getItem('mikeAdminSystemInstruction');
@@ -41,11 +39,8 @@ export const updateChatSystemInstruction = (newInstruction: string, isAdminUpdat
         const profileBlockContent = extractProfileBlock(newInstruction);
         instructionToUse = adminSavedInstruction.replace(profileBlockPlaceholder, profileBlockContent);
     } else {
-         // If admin update doesn't have placeholder, but original system instruction does,
-         // we need to preserve the profile block from the *current* system instruction
-         // or from the base SYSTEM_INSTRUCTION if current one is also missing it.
-         const currentProfileBlock = extractProfileBlock(currentSystemInstruction);
-         instructionToUse = adminSavedInstruction.replace(profileBlockPlaceholder, currentProfileBlock);
+        const currentProfileBlock = extractProfileBlock(currentSystemInstruction);
+        instructionToUse = adminSavedInstruction.replace(profileBlockPlaceholder, currentProfileBlock);
     }
   } else if (adminSavedInstruction) {
     const profileBlockContent = extractProfileBlock(newInstruction);
@@ -56,9 +51,7 @@ export const updateChatSystemInstruction = (newInstruction: string, isAdminUpdat
   
   if (instructionToUse !== currentSystemInstruction) {
     currentSystemInstruction = instructionToUse;
-    chatSession = null; 
-    // System instruction changes will also affect the next live audio session.
-    // If a live session is active, it will continue with old instruction until restarted.
+    chatSession = null;
   }
 };
 
@@ -68,7 +61,6 @@ const extractProfileBlock = (fullInstruction: string): string => {
     if (match && match[1]) {
         return match[1];
     }
-    // Fallback if the specific pattern is not found, try to extract based on SYSTEM_INSTRUCTION structure
     const placeholder = "{USER_PROFILE_INFO_BLOCK}";
     if (SYSTEM_INSTRUCTION.includes(placeholder)) {
         const parts = SYSTEM_INSTRUCTION.split(placeholder);
@@ -80,18 +72,15 @@ const extractProfileBlock = (fullInstruction: string): string => {
             if (potentialBlock.endsWith(parts[1])) {
                 potentialBlock = potentialBlock.substring(0, potentialBlock.length - parts[1].length);
             }
-            // Heuristic: if the extracted block contains "---" or is empty, it's likely the profile block
             if (potentialBlock.includes("---") || potentialBlock.trim() === "") return potentialBlock;
         }
     }
     return ""; 
 };
 
-
 const getChatSession = (): Chat => {
   if (!chatSession) {
     chatSession = ai.chats.create({
-      model: GEMINI_TEXT_MODEL,
       config: {
         systemInstruction: currentSystemInstruction,
       },
@@ -132,8 +121,8 @@ export const generateTextStream = async (
       message: messageParts,
     };
 
-    if (!uploadedImage || !uploadedImage.data) { // Only add tools for text-only prompts
-      requestPayload.tools = [{ googleSearch: {} }] as Tool[]; // Cast to Tool[]
+    if (!uploadedImage || !uploadedImage.data) {
+      requestPayload.tools = [{ googleSearch: {} }] as Tool[];
     }
 
     const result = await currentChat.sendMessageStream(requestPayload);
@@ -160,7 +149,6 @@ export const generateTextStream = async (
     } else {
         errorMessage += ` ${String(error)}`;
     }
-    // Check for specific grounding tool error
     if (String(error).includes("TOOL_CODE_INVALID_ARGUMENT") || String(error).includes("GoogleSearch")) {
         errorMessage += " قد تكون هناك مشكلة في استخدام أداة البحث حاليًا.";
     }
@@ -169,13 +157,11 @@ export const generateTextStream = async (
   }
 };
 
-
 export const generateImage = async (prompt: string): Promise<{ imageUrl?: string; error?: string }> => {
   if (!apiKey || apiKey === "MISSING_API_KEY") {
     return { error: "API Key not configured. Please contact the administrator." };
   }
   
-  // Check if the API key has billing enabled
   try {
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key=' + apiKey);
     const data = await response.json();
@@ -185,7 +171,6 @@ export const generateImage = async (prompt: string): Promise<{ imageUrl?: string
     }
     
     const imageResponse = await ai.models.generateImages({
-      model: GEMINI_IMAGE_MODEL,
       prompt: prompt,
       config: { numberOfImages: 1, outputMimeType: 'image/jpeg' },
     });
@@ -216,7 +201,6 @@ export const resetChat = (newSystemInstructionFromApp?: string): void => {
           instructionToUse = newSystemInstructionFromApp;
       }
   } else if (adminInstruction) {
-      // If no new instruction from app, but admin instruction exists, ensure profile block is empty for generic reset
       instructionToUse = adminInstruction.replace("{USER_PROFILE_INFO_BLOCK}", "");
   }
   
@@ -224,50 +208,13 @@ export const resetChat = (newSystemInstructionFromApp?: string): void => {
       currentSystemInstruction = instructionToUse;
       chatSession = null;
   } else if (newSystemInstructionFromApp && instructionToUse === currentSystemInstruction) {
-      // If the instruction from app is same as current, but we still want to reset session (e.g. new conversation)
       chatSession = null;
   }
-  // Also reset live audio session if active
   if (liveAudioSession) {
     liveAudioSession.close();
     liveAudioSession = null;
   }
 };
-
-// --- Live Audio Streaming Functions ---
-
-async function handleLiveSessionTurn(
-    onTextChunk: (text: string, isPartial: boolean) => void,
-    onAudioChunk: (audioData: string, mimeType: string) => void
-): Promise<void> {
-    let done = false;
-    let accumulatedText = "";
-    while (!done) {
-        const message = liveSessionResponseQueue.shift();
-        if (message) {
-            if (message.serverContent?.modelTurn?.parts) {
-                message.serverContent.modelTurn.parts.forEach(part => {
-                    if (part.text) {
-                        accumulatedText += part.text;
-                        onTextChunk(part.text, true); // Send partial text chunk
-                    }
-                    if (part.inlineData?.data && part.inlineData?.mimeType) {
-                        onAudioChunk(part.inlineData.data, part.inlineData.mimeType);
-                    }
-                });
-            }
-            if (message.serverContent?.turnComplete) {
-                done = true;
-                onTextChunk("", false); // Signal text accumulation is final for this turn
-                if(liveSessionTurnCompleCallback) liveSessionTurnCompleCallback();
-            }
-        } else {
-            // Wait for a short period if queue is empty
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
-    }
-}
-
 
 export const startLiveAudioSession = async (
   selectedVoiceName: string, 
@@ -286,34 +233,14 @@ export const startLiveAudioSession = async (
 
   liveSessionTurnCompleCallback = onTurnComplete;
   liveSessionErrorCallback = onError;
-  
-  const speechConfig: SpeechConfig = {
-    voiceConfig: {
-        prebuiltVoiceConfig: {
-            voiceName: selectedVoiceName || AI_VOICE_DEFAULT_URI 
-        } as PrebuiltVoiceConfig
-    } as VoiceConfig
-  };
-
-  const contextWindowCompression: ContextWindowCompressionConfig = { 
-      triggerTokens: '25600', 
-      slidingWindow: { targetTokens: '12800' }
-  };
 
   try {
     liveAudioSession = await ai.live.connect({
-      model: GEMINI_LIVE_AUDIO_MODEL,
       config: {
-        systemInstruction: currentSystemInstruction, // Added system instruction here
-        responseModalities: [Modality.AUDIO], 
-        mediaResolution: MediaResolution.MEDIA_RESOLUTION_MEDIUM,
-        speechConfig: speechConfig, 
-        contextWindowCompression: contextWindowCompression,
+        systemInstruction: currentSystemInstruction,
       },
       callbacks: {
-        onopen: () => {
-          // console.debug('Live audio session opened.');
-        },
+        onopen: () => {},
         onmessage: (message: LiveServerMessage) => {
           liveSessionResponseQueue.push(message);
         },
@@ -323,7 +250,6 @@ export const startLiveAudioSession = async (
           liveAudioSession = null; 
         },
         onclose: (e: CloseEvent) => {
-          // console.debug('Live audio session closed:', e.reason);
           liveAudioSession = null;
         },
       },
@@ -347,14 +273,10 @@ export const sendToLiveAudioSession = async (
     if(liveSessionErrorCallback) liveSessionErrorCallback("جلسة الصوت المباشر غير مفعلة.");
     return;
   }
-
-  // The system instruction is now set at the session level (in startLiveAudioSession).
-  // So, we just send the user's prompt directly.
-  const promptToSend = prompt;
   
   try {
     liveAudioSession.sendClientContent({
-      turns: [ { text: promptToSend } ] 
+      turns: [ { text: prompt } ] 
     });
     await handleLiveSessionTurn(onTextChunk, onAudioChunk);
   } catch (error) {
@@ -363,13 +285,42 @@ export const sendToLiveAudioSession = async (
   }
 };
 
+async function handleLiveSessionTurn(
+    onTextChunk: (text: string, isPartial: boolean) => void,
+    onAudioChunk: (audioData: string, mimeType: string) => void
+): Promise<void> {
+    let done = false;
+    let accumulatedText = "";
+    while (!done) {
+        const message = liveSessionResponseQueue.shift();
+        if (message) {
+            if (message.serverContent?.modelTurn?.parts) {
+                message.serverContent.modelTurn.parts.forEach(part => {
+                    if (part.text) {
+                        accumulatedText += part.text;
+                        onTextChunk(part.text, true);
+                    }
+                    if (part.inlineData?.data && part.inlineData?.mimeType) {
+                        onAudioChunk(part.inlineData.data, part.inlineData.mimeType);
+                    }
+                });
+            }
+            if (message.serverContent?.turnComplete) {
+                done = true;
+                onTextChunk("", false);
+                if(liveSessionTurnCompleCallback) liveSessionTurnCompleCallback();
+            }
+        } else {
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+    }
+}
+
 export const closeLiveAudioSession = (): void => {
   if (liveAudioSession) {
     try {
         liveAudioSession.close();
-    } catch (e) {
-        // console.warn("Error closing live audio session (might already be closed or in error state):", e);
-    }
+    } catch (e) {}
     liveAudioSession = null;
   }
   liveSessionResponseQueue = [];
